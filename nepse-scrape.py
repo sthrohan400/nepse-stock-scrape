@@ -8,7 +8,40 @@ from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
 from config import config
+import re
 contents = []
+
+def formatJson(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    #print(soup)
+    cont = soup.find('div', {"id" : "home-contents"})
+    cont = cont.findAllNext('tr')
+    # print(cont)
+    # print(html)
+    # Remove 0 and 1 index from list
+    try:
+        del cont[0]
+        del cont[1]
+    except IndexError as e:
+        return []
+    #converting data to list objects
+    #print(cont)
+    for val in cont:
+        # check all these data exists
+        try:
+            val = val.findAllNext('td')
+            temp = {}
+            temp['no_transaction'] = val[2].text
+            temp['max_price'] = val[3].text
+            temp['min_price'] = val[4].text
+            temp['close_price'] = val[5].text
+            temp['no_of_share_transaction'] = val[6].text
+            temp['amount'] = val[7].text
+            temp['previous_close_price'] = val[8].text
+            contents.append(temp)
+        except IndexError as e:
+            continue
+    return contents
 
 
 def format(html):
@@ -30,15 +63,23 @@ def format(html):
         # check all these data exists
         try:
             val = val.findAllNext('td')
-            temp = {}
-            temp['stock'] = val[1].text
-            temp['no_transaction'] = val[2].text
-            temp['max_price'] = val[3].text
-            temp['min_price'] = val[4].text
-            temp['close_price'] = val[5].text
-            temp['no_of_share_transaction'] = val[6].text
-            temp['amount'] = val[7].text
-            temp['previous_close_price'] = val[8].text
+
+            temp = ""
+            temp += val[1].text+","
+            temp += val[2].text+","
+            temp += val[3].text+","
+            temp += val[4].text+","
+            temp += val[5].text+","
+            temp += val[6].text+","
+            temp += val[7].text+","
+            temp += val[8].text+"\r\n"
+            # temp['no_transaction'] = val[2].text
+            # temp['max_price'] = val[3].text
+            # temp['min_price'] = val[4].text
+            # temp['close_price'] = val[5].text
+            # temp['no_of_share_transaction'] = val[6].text
+            # temp['amount'] = val[7].text
+            # temp['previous_close_price'] = val[8].text
             contents.append(temp)
         except IndexError as e:
             continue
@@ -52,9 +93,17 @@ def formatIndex(html):
     pager = cont.find('div', {"class": "pager"})
     pager_href = pager.findAllNext('a', href=True)
     for item in pager_href:
+        try:
+            item['href'] = item['href']
+        except KeyError:
+            continue
         if len(item['href']) < 50:
             continue
-        contents_url.append(item['href'])
+        if '/todays_price/' in item['href']:
+            contents_url.append(item['href'])
+        else:
+            continue
+
     return contents_url
 
 async def fetch(session, url):
