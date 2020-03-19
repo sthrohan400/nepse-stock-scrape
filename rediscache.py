@@ -16,8 +16,10 @@ class RedisCacheLibrary:
             RedisCacheLibrary.__instance = self
 
     @staticmethod
-    def getInstance(self):
+    def getInstance(self, config):
+
         if RedisCacheLibrary.__instance == None:
+            self.redis = redis.StrictRedis(host=config.get('redis').host, port=config.get('redis').port, password=config.get('redis').password)
             RedisCacheLibrary()
         return RedisCacheLibrary.__instance
 
@@ -26,3 +28,10 @@ class RedisCacheLibrary:
 
     def get(self, key):
         return self.get(key)
+    # Redis add list data
+    def push(self, key, value):
+        if type(value) is list:
+            pipeline = self.redis.pipeline()
+            for item in value:
+                pipeline.lpush(key, item)
+            pipeline.execute()
