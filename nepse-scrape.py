@@ -82,8 +82,8 @@ async def main(urls):
 
         # Set data to redis
         if(len(data_contents) > 0):
-           # RedisCacheLibrary.getInstance(config).push("nepse",data_contents)
-            print(data_contents)
+           RedisCacheLibrary.getInstance(config).push("nepse",data_contents)
+        #print(data_contents)
 
 
 
