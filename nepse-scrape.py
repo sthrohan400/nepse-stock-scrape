@@ -9,49 +9,46 @@ import aiohttp
 import asyncio
 from config import config
 import re
-contents = []
 
-def formatJson(html):
-    soup = BeautifulSoup(html, 'html.parser')
-    #print(soup)
-    cont = soup.find('div', {"id" : "home-contents"})
-    cont = cont.findAllNext('tr')
-    # print(cont)
-    # print(html)
-    # Remove 0 and 1 index from list
-    try:
-        del cont[0]
-        del cont[1]
-    except IndexError as e:
-        return []
-    #converting data to list objects
-    #print(cont)
-    for val in cont:
-        # check all these data exists
-        try:
-            val = val.findAllNext('td')
-            temp = {}
-            temp['no_transaction'] = val[2].text
-            temp['max_price'] = val[3].text
-            temp['min_price'] = val[4].text
-            temp['close_price'] = val[5].text
-            temp['no_of_share_transaction'] = val[6].text
-            temp['amount'] = val[7].text
-            temp['previous_close_price'] = val[8].text
-            contents.append(temp)
-        except IndexError as e:
-            continue
-    return contents
+
+# def formatJson(html):
+#     soup = BeautifulSoup(html, 'html.parser')
+#     #print(soup)
+#     cont = soup.find('div', {"id" : "home-contents"})
+#     cont = cont.findAllNext('tr')
+#     # print(cont)
+#     # print(html)
+#     # Remove 0 and 1 index from list
+#     try:
+#         del cont[0]
+#         del cont[1]
+#     except IndexError as e:
+#         return []
+#     #converting data to list objects
+#     #print(cont)
+#     for val in cont:
+#         # check all these data exists
+#         try:
+#             val = val.findAllNext('td')
+#             temp = {}
+#             temp['no_transaction'] = val[2].text
+#             temp['max_price'] = val[3].text
+#             temp['min_price'] = val[4].text
+#             temp['close_price'] = val[5].text
+#             temp['no_of_share_transaction'] = val[6].text
+#             temp['amount'] = val[7].text
+#             temp['previous_close_price'] = val[8].text
+#             contents.append(temp)
+#         except IndexError as e:
+#             continue
+#     return contents
 
 
 def format(html):
+    tempcontents = ""
     soup = BeautifulSoup(html, 'html.parser')
-    #print(soup)
     cont = soup.find('div', {"id" : "home-contents"})
     cont = cont.findAllNext('tr')
-    # print(cont)
-    # print(html)
-    # Remove 0 and 1 index from list
     try:
         del cont[0]
         del cont[1]
@@ -63,7 +60,6 @@ def format(html):
         # check all these data exists
         try:
             val = val.findAllNext('td')
-
             temp = ""
             temp += val[1].text+","
             temp += val[2].text+","
@@ -73,18 +69,10 @@ def format(html):
             temp += val[6].text+","
             temp += val[7].text+","
             temp += val[8].text+"\r\n"
-            # temp['no_transaction'] = val[2].text
-            # temp['max_price'] = val[3].text
-            # temp['min_price'] = val[4].text
-            # temp['close_price'] = val[5].text
-            # temp['no_of_share_transaction'] = val[6].text
-            # temp['amount'] = val[7].text
-            # temp['previous_close_price'] = val[8].text
-            contents.append(temp)
+            tempcontents += temp
         except IndexError as e:
             continue
-    #print(contents)
-    return contents
+    return tempcontents
 
 def formatIndex(html):
     contents_url = []
@@ -112,7 +100,7 @@ async def fetch(session, url):
 
 
 async def main(urls):
-    contents = []
+    data_contents = ""
     contents_url = []
     async with aiohttp.ClientSession() as session:
         # /** Loop Multiple Urls for Data scrape **/
@@ -127,8 +115,8 @@ async def main(urls):
         html = await asyncio.gather(*[fetch(session, val) for val in contents_url])
         for c in html:
             tempcontents = format(c)
-            contents = contents + tempcontents
-        print(contents)
+            data_contents = data_contents + tempcontents
+        print(data_contents)
 
 
 if __name__ == "__main__":
