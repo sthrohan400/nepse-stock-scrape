@@ -12,8 +12,9 @@ class RedisCacheLibrary:
         if RedisCacheLibrary.__instance != None:
             raise Exception("Class is Singleton.")
         else:
-            self.redis = redis.StrictRedis(host=config.get('redis').host, port=config.get('redis').port,
-                                           password=config.get('redis').password)
+            config = config.get('redis')
+            self.redis = redis.StrictRedis(host=config.get('host'), port=config.get('port'),
+                                           password=config.get('password'))
             RedisCacheLibrary.__instance = self
 
     @staticmethod
