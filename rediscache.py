@@ -1,10 +1,5 @@
 import redis
 
-redis_host = "localhost"
-redis_port = 6379
-redis_password = ""
-
-
 class RedisCacheLibrary:
     __instance = None
 
@@ -34,5 +29,5 @@ class RedisCacheLibrary:
         if type(value) is list:
             pipeline = self.redis.pipeline()
             for item in value:
-                pipeline.lpush(key, item)
+                pipeline.lpush(key, ','.join(item))
             pipeline.execute()
