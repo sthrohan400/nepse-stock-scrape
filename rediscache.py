@@ -8,19 +8,19 @@ redis_password = ""
 class RedisCacheLibrary:
     __instance = None
 
-    def __init__(self):
+    def __init__(self,config):
         if RedisCacheLibrary.__instance != None:
             raise Exception("Class is Singleton.")
         else:
-            self.redis = redis.StrictRedis(host = redis_host, port = redis_port, password= redis_password)
+            self.redis = redis.StrictRedis(host=config.get('redis').host, port=config.get('redis').port,
+                                           password=config.get('redis').password)
             RedisCacheLibrary.__instance = self
 
     @staticmethod
-    def getInstance(self, config):
+    def getInstance(config):
 
         if RedisCacheLibrary.__instance == None:
-            self.redis = redis.StrictRedis(host=config.get('redis').host, port=config.get('redis').port, password=config.get('redis').password)
-            RedisCacheLibrary()
+            RedisCacheLibrary(config)
         return RedisCacheLibrary.__instance
 
     def set(self, key, value):
