@@ -26,6 +26,7 @@ class RedisCacheLibrary:
         return self.get(key)
     # Redis add list data
     def push(self, key, value):
+        self.redis.delete(key)
         if type(value) is list:
             pipeline = self.redis.pipeline()
             for item in value:
