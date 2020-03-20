@@ -19,7 +19,7 @@ def formatListTuple(html):
     cont = cont.findAllNext('tr')
     try:
         del cont[0]
-        del cont[1]
+        # del cont[1]
     except IndexError as e:
         return []
     for val in cont:
@@ -74,7 +74,6 @@ async def main(urls):
             contents_url = contents_url + tempurl
         # run gathering data
         contents_url = contents_url + urls
-        print(contents_url)
         html = await asyncio.gather(*[fetch(session, val) for val in contents_url])
         for c in html:
             tempcontents = formatListTuple(c)
@@ -82,8 +81,7 @@ async def main(urls):
 
         # Set data to redis
         if(len(data_contents) > 0):
-           RedisCacheLibrary.getInstance(config).push("nepse",data_contents)
-        #print(data_contents)
+            RedisCacheLibrary.getInstance(config).push("nepse",data_contents)
 
 
 
