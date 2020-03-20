@@ -1,5 +1,5 @@
 import redis
-
+from datetime import datetime
 class RedisCacheLibrary:
     __instance = None
 
@@ -29,6 +29,7 @@ class RedisCacheLibrary:
         self.redis.delete(key)
         if type(value) is list:
             pipeline = self.redis.pipeline()
+            pipeline.lpush(key,datetime.now())
             for item in value:
                 pipeline.lpush(key, ','.join(item))
             pipeline.execute()
