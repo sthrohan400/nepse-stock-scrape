@@ -5,10 +5,11 @@
     Scrape function usage aiohttp and asyncio module to gather data
 '''
 from bs4 import BeautifulSoup
-import aiohttp
+import aiohttp ,datetime
 import asyncio
 from config import config
-from rediscache import RedisCacheLibrary
+# from rediscache import RedisCacheLibrary
+from dbconnection import MysqlConnectionManager
 
 
 def formatListTuple(html):
@@ -81,7 +82,30 @@ async def main(urls):
 
         # Set data to redis
         if(len(data_contents) > 0):
-            RedisCacheLibrary.getInstance(config).push("nepse",data_contents)
+            RedisCacheLibrary.getInstance(config.get('redis')).push("nepse",data_contents)
+            # Check
+            utc_time = datetime.datetime.now(datetime.timezone.utc)
+            print(utc_time)
+            nepal_time = utc_time + datetime.timedelta(minutes=345)# add 5 Hours 45 min
+            print(nepal_time)
+            check_time = nepal_time.replace(hour=23, minute=50)
+            print(check_time)
+            if(nepal_time > check_time):
+                # Perform database EOD insertion
+                dbcursor = MysqlConnectionManager.getInstance(config.get('mysql')).connection.cursor()
+                sql = """INSERT INTO eod_share_price
+                        (company,num_transaction,max_price,
+                        min_price,close_price,total_share_transaction,amount,
+                        previous_closing_price
+                        )
+                        VALUES
+                        (%s,%s,%s,%s,%s,%s,%s,%s)
+                        """
+                dbcursor.executemany(sql,data_contents)
+
+
+            #.strftime("Y%m%d%H%M%S")
+
 
 
 
