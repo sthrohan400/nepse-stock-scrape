@@ -29,7 +29,7 @@ class RedisCacheLibrary:
         self.redis.delete(key)
         if type(value) is list:
             pipeline = self.redis.pipeline()
-            pipeline.lpush(key,datetime.now())
+            pipeline.lpush(key,datetime.now().strftime("%Y%m%d%H%M%S"))
             for item in value:
                 pipeline.lpush(key, ','.join(item))
             pipeline.execute()
