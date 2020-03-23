@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import aiohttp ,datetime
 import asyncio
 from config import config
-# from rediscache import RedisCacheLibrary
+from rediscache import RedisCacheLibrary
 from dbconnection import MysqlConnectionManager
 
 

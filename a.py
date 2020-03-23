@@ -1,0 +1,1 @@
+http://newweb.nepalstock.com.np/api/nots/securityDailyTradeStat/
