@@ -88,9 +88,11 @@ async def main(urls):
             print(utc_time)
             nepal_time = utc_time + datetime.timedelta(minutes=345)# add 5 Hours 45 min
             print(nepal_time)
-            check_time = nepal_time.replace(hour=23, minute=50)
-            print(check_time)
-            if(nepal_time < check_time):
+            # check_time = nepal_time.replace(hour=23, minute=50)
+            # print(check_time)
+            # /** Check hour **/
+            nepal_time_hour =  nepal_time.hour;
+            if(nepal_time_hour > 23): # // check nepal hour for day is 11PM add to EOD tables
                 # Perform database EOD insertion
                 dbcursor = MysqlConnectionManager.getInstance(config.get('mysql')).connection.cursor()
                 sql = """INSERT INTO eod_share_price
