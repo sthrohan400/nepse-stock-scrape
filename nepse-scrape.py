@@ -90,7 +90,7 @@ async def main(urls):
             print(nepal_time)
             check_time = nepal_time.replace(hour=23, minute=50)
             print(check_time)
-            if(nepal_time > check_time):
+            if(nepal_time < check_time):
                 # Perform database EOD insertion
                 dbcursor = MysqlConnectionManager.getInstance(config.get('mysql')).connection.cursor()
                 sql = """INSERT INTO eod_share_price
